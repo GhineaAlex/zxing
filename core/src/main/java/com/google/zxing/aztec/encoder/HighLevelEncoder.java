@@ -18,6 +18,9 @@ package com.google.zxing.aztec.encoder;
 
 import com.google.zxing.common.BitArray;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -303,5 +306,17 @@ public final class HighLevelEncoder {
     }
     return result;
   }
+
+  public static BufferedImage whiteBorder(BufferedImage qrImage, int dimension) {
+	  	BufferedImage white = new BufferedImage(dimension+20, dimension+20, BufferedImage.TYPE_INT_RGB);
+	  	Graphics g = white.createGraphics();
+		g.setColor(Color.white);
+		g.fillRect(0,  0, 500, 500);
+		Graphics gp = white.createGraphics();
+		gp.drawImage(qrImage, 10, 10, null);
+
+		return white;
+
+}
 
 }

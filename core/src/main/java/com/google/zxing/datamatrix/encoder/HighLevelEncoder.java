@@ -16,9 +16,21 @@
 
 package com.google.zxing.datamatrix.encoder;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Dimension;
+import com.google.zxing.datamatrix.encoder.*;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.datamatrix.DataMatrixWriter;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+
+import javax.imageio.ImageIO;
 
 /**
  * DataMatrix ECC 200 data encoder following the algorithm described in ISO/IEC 16022:200(E) in
@@ -124,6 +136,15 @@ public final class HighLevelEncoder {
     return msg.getBytes(Charset.forName("cp437")); //See 4.4.3 and annex B of ISO/IEC 15438:2001(E)
   }
    */
+  public static byte[] getBytesForMessage(String msg) {
+      final String charset = "cp437"; // See 4.4.3 and annex B of ISO/IEC
+                                      // 15438:2001(E)
+      try {
+         return msg.getBytes(charset);
+      } catch (UnsupportedEncodingException e) {
+         throw new UnsupportedOperationException("Incompatible JVM! The '" + charset + "' charset is not available!");
+      }
+   }
 
   private static char randomize253State(char ch, int codewordPosition) {
     int pseudoRandom = ((149 * codewordPosition) % 253) + 1;
@@ -449,5 +470,7 @@ public final class HighLevelEncoder {
     hex = "0000".substring(0, 4 - hex.length()) + hex;
     throw new IllegalArgumentException("Illegal character: " + c + " (0x" + hex + ')');
   }
+
+ 
 
 }
