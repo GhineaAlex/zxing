@@ -17,7 +17,7 @@
 package com.google.zxing.datamatrix.encoder;
 
 final class ASCIIEncoder implements Encoder {
-
+  private static final char FNC1 = 232;
   @Override
   public int getEncodingMode() {
     return HighLevelEncoder.ASCII_ENCODATION;
@@ -33,6 +33,15 @@ final class ASCIIEncoder implements Encoder {
       context.pos += 2;
     } else {
       char c = context.getCurrentChar();
+      if(context.isGs1()){
+    	  if( c == '\\' && context.getMessage().charAt(context.pos + 1) == 'F') {
+    		  context.writeCodeword(FNC1);
+    		  context.pos +=2;
+    		  return;
+    	  }
+
+      }
+
       int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
       if (newMode != getEncodingMode()) {
         switch (newMode) {

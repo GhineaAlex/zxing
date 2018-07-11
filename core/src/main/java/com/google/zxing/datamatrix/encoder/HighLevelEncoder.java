@@ -41,7 +41,7 @@ public final class HighLevelEncoder {
   /**
    * FNC1 Codeword
    */
-  //private static final char FNC1 = 232;
+  private static final char FNC1 = 232;
   /**
    * Structured Append Codeword
    */
@@ -87,7 +87,7 @@ public final class HighLevelEncoder {
    * Unlatch from X12 encodation
    */
   static final char X12_UNLATCH = 254;
-
+  private static final String MACRO_04_HEADER = "\\F";
   /**
    * 05 Macro header
    */
@@ -175,6 +175,10 @@ public final class HighLevelEncoder {
       context.writeCodeword(MACRO_06);
       context.setSkipAtEnd(2);
       context.pos += MACRO_06_HEADER.length();
+    } else if (msg.startsWith(MACRO_04_HEADER)) {
+    	context.writeCodeword(FNC1);
+    	context.setGs1(true);
+    	context.pos += MACRO_04_HEADER.length();
     }
 
     int encodingMode = ASCII_ENCODATION; //Default mode

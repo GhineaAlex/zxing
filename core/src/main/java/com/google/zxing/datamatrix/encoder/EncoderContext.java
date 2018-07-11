@@ -16,37 +16,55 @@
 
 package com.google.zxing.datamatrix.encoder;
 
-import com.google.zxing.Dimension;
+import java.io.UnsupportedEncodingException;
 
-import java.nio.charset.StandardCharsets;
+import com.google.zxing.Dimension;
 
 final class EncoderContext {
 
-  private final String msg;
-  private SymbolShapeHint shape;
+   final String msg;
+  private SymbolShapeHint shape = SymbolShapeHint.FORCE_NONE; //changed
   private Dimension minSize;
   private Dimension maxSize;
   private final StringBuilder codewords;
-  int pos;
-  private int newEncoding;
+  int pos = 0;
+  private int newEncoding = -1;
   private SymbolInfo symbolInfo;
-  private int skipAtEnd;
+  private int skipAtEnd = 0;
+  private static final String DEFAULT_ASCII_ENCODING = "ISO-8859-1";
+  private boolean gs1;
 
   EncoderContext(String msg) {
     //From this point on Strings are not Unicode anymore!
-    byte[] msgBinary = msg.getBytes(StandardCharsets.ISO_8859_1);
+    byte[] msgBinary;
+    try {
+    	msgBinary = msg.getBytes(DEFAULT_ASCII_ENCODING);
+    } catch(UnsupportedEncodingException e) {
+    	throw new UnsupportedOperationException("Unsupported encoding" + e.getMessage());
+    }
     StringBuilder sb = new StringBuilder(msgBinary.length);
     for (int i = 0, c = msgBinary.length; i < c; i++) {
       char ch = (char) (msgBinary[i] & 0xff);
       if (ch == '?' && msg.charAt(i) != '?') {
         throw new IllegalArgumentException("Message contains characters outside ISO-8859-1 encoding.");
       }
+
       sb.append(ch);
     }
     this.msg = sb.toString(); //Not Unicode here!
-    shape = SymbolShapeHint.FORCE_NONE;
+
     this.codewords = new StringBuilder(msg.length());
-    newEncoding = -1;
+  }
+
+  public EncoderContext(byte[] data) {
+	  StringBuilder sb = new StringBuilder(data.length);
+	  for(int i = 0, c = data.length; i < c; i++) {
+		  char ch = (char) (data[i] & 0xff);
+		  sb.append(ch);
+	  }
+	  this.msg = sb.toString();
+	  this.codewords = new StringBuilder(msg.length());
+
   }
 
   public void setSymbolShape(SymbolShapeHint shape) {
@@ -130,5 +148,12 @@ final class EncoderContext {
 
   public void resetSymbolInfo() {
     this.symbolInfo = null;
+  }
+
+  public boolean isGs1() {
+	  return gs1;
+  }
+  public void setGs1(boolean gs1) {
+	  this.gs1 = gs1;
   }
 }
